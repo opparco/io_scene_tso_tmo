@@ -9,7 +9,7 @@ import shutil
 import bpy
 from io_scene_tso_tmo.io.tso import TSOFile, TSOMesh, TSOSubMesh, Vertex, TSOSubScript, TSOTexture
 from io_scene_tso_tmo.utils.heap import Heap
-from io_scene_tso_tmo.utils.partitioner import Partitioner
+from io_scene_tso_tmo.utils.partition import Partition
 from io_scene_tso_tmo.utils.tristrip import stripify
 
 def export_tso(tso, sample, dirname):
@@ -181,24 +181,24 @@ def export_tso(tso, sample, dirname):
 
 			# NOTE: polygons have been terminated
 
-			partitioner = Partitioner(comb_set, len(ob.vertex_groups))
-			partitioner.run()
+			partition = Partition(comb_set, len(ob.vertex_groups))
+			partition.run()
 
-			print("len palettes:{}".format(len(partitioner.palettes)))
-			print("palattes:{}".format(partitioner.palettes))
+			print("len palettes:{}".format(len(partition.palettes)))
+			print("palattes:{}".format(partition.palettes))
 
 			palette_poly_indices = []
-			for i in range(len(partitioner.palettes)):
+			for i in range(len(partition.palettes)):
 				palette_poly_indices.append([])
 
 			# face (= poly) をsub_mesh (= palette) でわけわけ
 			for poly_idx, comb in enumerate(poly_combs):
 				if comb is None:
 					continue
-				palette_idx = partitioner.comb_palette_map[comb]
+				palette_idx = partition.comb_palette_map[comb]
 				palette_poly_indices[palette_idx].append(poly_idx)
 
-			for palette_idx, palette in enumerate(partitioner.palettes):
+			for palette_idx, palette in enumerate(partition.palettes):
 				sub_mesh = TSOSubMesh()
 				a_heap = Heap()
 

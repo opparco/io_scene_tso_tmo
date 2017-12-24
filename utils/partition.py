@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 
-"""Partitioner: partition bone combination set into palettes
+"""Partition: partition bone combination set into palettes
 cf. Skin Splitting for Optimal Rendering
 http://www.gameenginegems.net/gemsdb/article.php?id=423
 """
 
-class Partitioner(object):
+class Partition(object):
 
 	def __init__(self, comb_set, nodes_len):
 		self.comb_set = comb_set
@@ -119,14 +119,14 @@ if __name__ == "__main__":
 	comb_set = {(0,), (0, 4, 5), (0, 3, 4), (0, 1, 2), (0, 1, 3), (0, 3)}
 	nodes_len = 6
 
-	partitioner = Partitioner(comb_set, nodes_len)
+	partition = Partition(comb_set, nodes_len)
 
-	print("len bone_counts:{}".format(len(partitioner.bone_counts)))
-	print("bone_counts:{}".format(partitioner.bone_counts))
+	print("len bone_counts:{}".format(len(partition.bone_counts)))
+	print("bone_counts:{}".format(partition.bone_counts))
 
-	print(partitioner.run())
+	print(partition.run())
 
-	print("len palattes:{}".format(len(partitioner.palettes)))
-	print("palattes:{}".format(partitioner.palettes))
+	print("len palattes:{}".format(len(partition.palettes)))
+	print("palattes:{}".format(partition.palettes))
 
-	print("comb palette map:{}".format(partitioner.comb_palette_map))
+	print("comb palette map:{}".format(partition.comb_palette_map))
