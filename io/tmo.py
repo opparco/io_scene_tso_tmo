@@ -5,6 +5,7 @@
 
 from struct import pack, unpack
 from mathutils import Matrix, Vector
+from io_scene_tso_tmo import turned_nodes
 
 def read_cstring(file):
 	byt = b''
@@ -81,8 +82,9 @@ class TMOFile(object):
 			# motionでなくposeとして扱う
 			matrices_count = read_int(file)
 			for i in range(matrices_count):
+				node = self.nodes[i]
 				m = read_matrix4(file)
-				self.nodes[i].transform = m
+				node.transform = turned_nodes.turned_matrix4(m, node.name)
 
 			# footer = file.read(4)
 

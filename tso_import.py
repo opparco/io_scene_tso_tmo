@@ -87,12 +87,6 @@ def import_tso(tso, dirname):
 			b_bone.tail.y += 0.25
 			b_bone.transform(t_node.b_world_coordinate())
 
-			# bpy: EditBone.transformは反転に対応できてないぽい
-
-			# ここで反転させる
-			if t_node.world_turned():
-				b_bone.roll = radians(+180)
-
 			# print("bone {} head:{} roll:{}".format(b_bone.name, b_bone.head, b_bone.roll))
 
 			# b_bone.use_inherit_rotation = False

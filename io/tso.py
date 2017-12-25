@@ -89,9 +89,6 @@ class TSONode(object):
 
 		return m
 
-	def world_turned(self):
-		return turned_nodes.in_rotation(self.name)
-
 class TSOTexture(object):
 	def __init__(self):
 		self.name = None
@@ -382,7 +379,8 @@ class TSOFile(object):
 			matrices_count = read_int(file)
 			for i in range(matrices_count):
 				node = self.nodes[i]
-				node.transform = read_matrix4(file)
+				m = read_matrix4(file)
+				node.transform = turned_nodes.turned_matrix4(m, node.name)
 
 			textures_count = read_int(file)
 			del self.textures[:]
@@ -422,7 +420,8 @@ class TSOFile(object):
 
 			write_int(file, len(self.nodes))
 			for node in self.nodes:
-				write_matrix4(file, node.transform)
+				m = turned_nodes.turned_matrix4(node.transform, node.name)
+				write_matrix4(file, m)
 
 			write_int(file, len(self.textures))
 			for texture in self.textures:
