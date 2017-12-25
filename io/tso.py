@@ -8,6 +8,7 @@ import re
 import numpy as np
 from struct import pack, unpack, unpack_from
 from mathutils import Matrix, Vector
+from io_scene_tso_tmo import turned_nodes
 
 def read_cstring(file):
 	bytes = b''
@@ -57,8 +58,6 @@ def write_vector2(file, value):
 
 
 class TSONode(object):
-	# 反転すべきnode
-	turned_nodes = {'Head', 'Ha_Down', 'Ha_UP', 'hana', 'Me_Left_Futi', 'Me_Left', 'Me_Right_Futi', 'Me_Right', 'Kami_Oya', 'skirt_LeftB01', 'skirt_RightB01', 'skirt_RightS01', 'skirt_RightF01', 'skirt_LeftF01', 'skirt_LeftS01'}
 
 	def __init__(self):
 		self.name = None
@@ -91,14 +90,7 @@ class TSONode(object):
 		return m
 
 	def world_turned(self):
-		node = self
-		turned = False
-		while node:
-			if node.name in TSONode.turned_nodes:
-				turned = not turned
-			node = node.parent
-
-		return turned
+		return turned_nodes.in_rotation(self.name)
 
 class TSOTexture(object):
 	def __init__(self):
