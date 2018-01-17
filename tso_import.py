@@ -109,6 +109,7 @@ def import_tso(tso, dirname):
 
 		faces = []
 		uv_faces = []
+		uv_specs = []
 		material_indices = []
 		weits = []
 		
@@ -152,6 +153,7 @@ def import_tso(tso, dirname):
 					faces.append(( a, c, b ))
 					uv_faces.append(( va.uv, vc.uv, vb.uv ))
 
+				uv_specs.append(sub.spec)
 				material_indices.append(material_index)
 
 		# print("len faces {}".format(len(faces)))
@@ -183,8 +185,12 @@ def import_tso(tso, dirname):
 
 		b_mesh.uv_textures.new()
 
-		# uv_tex_polys = b_mesh.uv_textures.active.data[:]
+		uv_tex_polys = b_mesh.uv_textures.active.data[:]
 		# print("len uv_tex_polys {}".format(len(uv_tex_polys)))
+
+		for i, spec in enumerate(uv_specs):
+			sub = tso.sub_scripts[spec]
+			uv_tex_polys[i].image = sub.b_color_texture.image
 
 		uv_loops = b_mesh.uv_layers.active.data[:]
 		# print("len uv_loops {}".format(len(uv_loops)))
