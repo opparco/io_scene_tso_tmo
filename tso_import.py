@@ -125,6 +125,8 @@ def import_tso(tso, dirname):
 			b = -1
 			c = -1
 			
+			material_index = spec_heap.append(sub.spec)
+
 			for v in sub.vertices:
 				ccw = not ccw
 				va, vb, vc = vb, vc, v
@@ -150,7 +152,7 @@ def import_tso(tso, dirname):
 					faces.append(( a, c, b ))
 					uv_faces.append(( va.uv, vc.uv, vb.uv ))
 
-				material_indices.append(spec_heap.append(sub.spec))
+				material_indices.append(material_index)
 
 		# print("len faces {}".format(len(faces)))
 
