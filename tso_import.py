@@ -332,7 +332,7 @@ def import_tso(tso, dirname):
 	scene.objects.link(b_object)
 	scene.objects.active = b_object
 
-	for t_mesh in tso.meshes:
+	for t_mesh in reversed(tso.meshes):
 		b_mesh_object = import_mesh(t_mesh)
 		b_mesh_object.parent = b_object
 		create_armature_modifier(b_mesh_object, b_armature_object)
