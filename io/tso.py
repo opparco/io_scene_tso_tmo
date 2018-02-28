@@ -268,10 +268,10 @@ class Vertex(object):
 		self.skin_weights = []
 
 	def __eq__(self, other):
-		return self.co == other.co and self.uv == other.uv
+		return self.co == other.co and self.no == other.no and self.uv == other.uv
 
 	def __hash__(self):
-		return hash((self.co, self.uv))
+		return hash((self.co, self.no, self.uv))
 
 	def read(self, file):
 		self.co = read_vector3(file)
