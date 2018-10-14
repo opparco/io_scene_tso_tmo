@@ -41,10 +41,10 @@ def import_tso(tso, dirname):
 			bpy.ops.object.mode_set(mode="OBJECT")
 
 		b_armature = bpy.data.armatures.new('Armature')
-		b_armature.show_axes = True # 座標軸
+		b_armature.show_axes = True  # 座標軸
 		b_object = bpy.data.objects.new(b_armature.name, b_armature)
 		b_object.select = True
-		b_object.show_x_ray = True # 透視
+		b_object.show_x_ray = True  # 透視
 
 		# object scale
 		b_object.scale[0] = world_scale # x
@@ -84,8 +84,8 @@ def import_tso(tso, dirname):
 				t_node.parent = None
 				b_bone.parent = None
 
-			b_bone.tail.y += 0.25
-			b_bone.transform(t_node.b_world_coordinate())
+			b_bone.tail.y = 0.25
+			b_bone.matrix = t_node.b_world_coordinate()
 
 			# print("bone {} head:{} roll:{}".format(b_bone.name, b_bone.head, b_bone.roll))
 
