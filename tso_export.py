@@ -85,6 +85,14 @@ def export_tso(tso, sample, dirname):
 
 		return spec
 
+	def triangulate(me):
+		import bmesh
+		bm = bmesh.new()
+		bm.from_mesh(me)
+		bmesh.ops.triangulate(bm, faces=bm.faces)
+		bm.to_mesh(me)
+		bm.free()
+
 	def export_mesh(me, b_object):
 		print("me name:{} #polygons:{} #vertices:{}".format(me.name, len(me.polygons), len(me.vertices)))
 
@@ -246,6 +254,7 @@ def export_tso(tso, sample, dirname):
 			continue
 
 		me = ob.data
+		triangulate(me)
 		export_mesh(me, ob)
 
 
