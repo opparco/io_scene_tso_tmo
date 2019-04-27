@@ -7,7 +7,7 @@ from itertools import groupby
 import os
 import shutil
 import bpy
-from io_scene_tso_tmo.io.tso import TSOFile, TSOMesh, TSOSubMesh, Vertex, TSOSubScript, TSOTexture
+from io_scene_tso_tmo.io.tso import TSOFile, TSONode, TSOMesh, TSOSubMesh, Vertex, TSOSubScript, TSOTexture
 from io_scene_tso_tmo.utils.heap import Heap
 from io_scene_tso_tmo.utils.partition import Partition
 from io_scene_tso_tmo.utils.tristrip import stripify
@@ -18,13 +18,60 @@ def export_tso(tso, sample, dirname):
 	tso: 書き出しtso
 	sample: 参照tso
 	"""
-	tso.nodes = sample.nodes
 	tso.scripts = sample.scripts
 
 	sample_sub = sample.sub_scripts[0]
 
-	def export_armature():
-		pass
+	def detect_armature():
+		found = None
+		for ob in bpy.context.selected_objects:
+			if ob.type == 'ARMATURE':
+				found = ob
+				break
+		return found
+
+	def export_armature(b_armature, b_object):
+		t_nodes = []
+
+		# map name to t_node
+		# t_node.path を作るために必要
+		t_nodemap = {}
+
+		for b_bone in b_armature.bones:
+			print("  b_bone name:{}".format(b_bone.name))
+
+			t_node = TSONode()
+			t_node.name = b_bone.name
+
+			b_parent = b_bone.parent
+
+			if b_parent is None:
+				t_node.b_transform = b_bone.matrix_local
+				t_node.path = '|' + b_bone.name
+			else:
+				t_node.b_transform = b_parent.matrix_local.inverted() * b_bone.matrix_local
+				t_node.path = t_nodemap[b_parent.name].path + '|' + b_bone.name
+
+			print("  t_node path:{}".format(t_node.path))
+
+			t_nodes.append(t_node)
+			t_nodemap[t_node.name] = t_node
+
+		for t_node in t_nodes:
+			# blender行列からdirectx行列に変換
+			m = t_node.b_transform
+			m.transpose()
+			t_node.transform = m
+
+		tso.nodes = t_nodes
+
+	b_armature_object = detect_armature()
+
+	if b_armature_object is None:
+		tso.nodes = sample.nodes
+	else:
+		b_armature = b_armature_object.data
+		export_armature(b_armature, b_armature_object)
 
 	def add_texture(tex):
 		print("  tex name:{}".format(tex.name))
