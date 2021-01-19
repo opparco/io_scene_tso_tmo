@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 
-import os
 from io_scene_tso_tmo.io.tso import TSOFile
 
 def dump_tso(tso):
@@ -16,6 +15,8 @@ def dump_tsofile(source_file):
 	dump_tso(tso)
 
 if __name__ == "__main__":
+	import os
+
 	source_file = os.path.join(os.path.expanduser('~'), "resources/mod1.tso")
 	dump_tsofile(source_file)
 

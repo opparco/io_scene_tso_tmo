@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-"""TechArts3D tmo file importer for blender 2.78
+"""TechArts3D tmo file importer for blender 2.80
 """
 
 import os
@@ -18,13 +18,18 @@ def matrix_scale(v):
 
 def import_tmo(tmo, sample):
 
-	def import_pose():
-		b_object = bpy.data.objects['Armature']
-		b_object.select = True
+	def detect_armature():
+		found = None
+		for ob in bpy.context.selected_objects:
+			if ob.type == 'ARMATURE':
+				found = ob
+				break
+		return found
 
-		scene = bpy.context.scene
-		# scene.objects.link(b_object)
-		scene.objects.active = b_object
+	def import_pose(b_armature_object, view_layer):
+		collection = view_layer.active_layer_collection.collection
+		# collection.objects.link(b_armature_object)
+		view_layer.objects.active = b_armature_object
 
 		# 辞書を作る
 		sample_nodemap = {}
@@ -57,7 +62,7 @@ def import_tmo(tmo, sample):
 
 		bpy.ops.object.mode_set(mode="POSE")
 
-		b_pose = b_object.pose
+		b_pose = b_armature_object.pose
 		for p_bone in b_pose.bones:
 			sample_node = sample_nodemap[p_bone.name]
 			if not sample_node:
@@ -78,9 +83,14 @@ def import_tmo(tmo, sample):
 			else:
 				parent_scale = Matrix.Identity(4)
 
-			p_bone.matrix_basis = sample_node.b_transform.inverted() * node.b_transform * parent_scale
+			p_bone.matrix_basis = sample_node.b_transform.inverted() @ node.b_transform @ parent_scale
 
-	import_pose()
+	view_layer = bpy.context.view_layer
+
+	# 既存のarmatureを使う
+	b_armature_object = detect_armature()
+
+	import_pose(b_armature_object, view_layer)
 
 def import_tmofile(source_file, sample_file):
 	tmo = TMOFile()
@@ -96,7 +106,7 @@ if __name__ == "__main__":
 
 	start_time = time()
 	# source_file = os.path.join(os.environ['HOME'], "resources/base-tpo1.tmo")
-	source_file = os.path.join(os.environ['HOME'], "resources/5.tmo")
+	source_file = os.path.join(os.environ['HOME'], "resources/1.tmo")
 	sample_file = os.path.join(os.environ['HOME'], "resources/base-defo.tmo")
 	import_tmofile(source_file, sample_file)
 

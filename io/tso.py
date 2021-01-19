@@ -84,7 +84,7 @@ class TSONode(object):
 		node = self
 		m = Matrix.Identity(4)
 		while node:
-			m = node.b_transform * m
+			m = node.b_transform @ m
 			node = node.parent
 
 		return m

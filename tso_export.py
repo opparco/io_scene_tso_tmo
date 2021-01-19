@@ -1,11 +1,10 @@
 #!/usr/bin/env python
 
-"""TechArts3D tso file exporter for blender 2.78
+"""TechArts3D tso file exporter for blender 2.80
 """
 
 from itertools import groupby
 import os
-import shutil
 import bpy
 from io_scene_tso_tmo.io.tso import TSOFile, TSONode, TSOMesh, TSOSubMesh, Vertex, TSOSubScript, TSOTexture
 from io_scene_tso_tmo.utils.heap import Heap
@@ -49,7 +48,7 @@ def export_tso(tso, sample, dirname):
 				t_node.b_transform = b_bone.matrix_local
 				t_node.path = '|' + b_bone.name
 			else:
-				t_node.b_transform = b_parent.matrix_local.inverted() * b_bone.matrix_local
+				t_node.b_transform = b_parent.matrix_local.inverted() @ b_bone.matrix_local
 				t_node.path = t_nodemap[b_parent.name].path + '|' + b_bone.name
 
 			print("  t_node path:{}".format(t_node.path))
@@ -60,8 +59,7 @@ def export_tso(tso, sample, dirname):
 		for t_node in t_nodes:
 			# blender行列からdirectx行列に変換
 			m = t_node.b_transform
-			m.transpose()
-			t_node.transform = m
+			t_node.transform = m.transposed()
 
 		tso.nodes = t_nodes
 

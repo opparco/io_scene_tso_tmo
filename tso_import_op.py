@@ -8,11 +8,11 @@ from io_scene_tso_tmo import tso_import
 
 class TsoImportOperator(bpy.types.Operator, ImportHelper):
 	bl_idname = "import_scene.tso"
-
 	bl_label = "Import TSO"
+	bl_options = {'PRESET', 'UNDO'}
 
 	filename_ext = ".tso"
-	filter_glob = bpy.props.StringProperty(default="*.tso", options={'HIDDEN'})
+	filter_glob: bpy.props.StringProperty(default="*.tso", options={'HIDDEN'})
 
 	def execute(self, context):
 		source_file = self.properties.filepath
