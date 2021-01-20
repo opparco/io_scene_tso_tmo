@@ -251,9 +251,9 @@ def import_tso(tso, dirname):
 	view_transform_orig = bpy.context.scene.view_settings.view_transform
 	bpy.context.scene.view_settings.view_transform = 'Raw'
 
-	# texture file を読み込んで b_texture を作る
-	# 辞書を作る {name: b_texture}
-	b_texmap = {}
+	# texture file を読み込んで b_image を作る
+	# 辞書を作る {name: b_image}
+	b_imagemap = {}
 	for tex in tso.textures:
 		print("tex name:{} path:{}".format(tex.name, tex.path))
 		path = tex.path.strip('"')
@@ -276,11 +276,7 @@ def import_tso(tso, dirname):
 		b_image.filepath_raw = tex_realpath
 		b_image.source = 'FILE'
 
-		b_tex = bpy.data.textures.new(tex.name, 'IMAGE')
-		b_tex.use_fake_user = True
-		b_tex.image = b_image
-
-		b_texmap[tex.name] = b_tex
+		b_imagemap[tex.name] = b_image
 
 	bpy.context.scene.view_settings.view_transform = view_transform_orig
 
@@ -292,7 +288,6 @@ def import_tso(tso, dirname):
 		sub_realpath = os.path.join(dirname, sub.name)
 		b_mat = bpy.data.materials.new(sub.name)
 		b_mat_wrap = node_shader_utils.PrincipledBSDFWrapper(b_mat, is_readonly=False)
-		b_mat_wrap.use_nodes = True
 
 		# diffuse
 		b_mat.diffuse_color = (1.0, 1.0, 1.0, 1.0)
@@ -314,8 +309,8 @@ def import_tso(tso, dirname):
 		### b_mat.specular_alpha = 0.0
 
 		sub.b_material = b_mat
-		sub.b_color_texture = b_texmap[sub.map['ColorTex']]
-		sub.b_shade_texture = b_texmap[sub.map['ShadeTex']]
+		sub.b_color_texture = b_imagemap[sub.map['ColorTex']]
+		sub.b_shade_texture = b_imagemap[sub.map['ShadeTex']]
 
 		### b_texslot = b_mat.texture_slots.add()
 		### b_texslot.texture = sub.b_color_texture
@@ -326,8 +321,18 @@ def import_tso(tso, dirname):
 		### b_texslot.use_map_color_diffuse = True
 		### b_texslot.use_map_alpha = True
 
-		b_mat_wrap.base_color_texture.image = sub.b_color_texture.image
+		b_mat_wrap.base_color_texture.image = sub.b_color_texture
 		b_mat_wrap.base_color_texture.texcoords = 'UV'
+		b_mat_wrap.base_color_texture.node_image.label = sub.map['ColorTex']
+
+		tree = b_mat.node_tree
+		node_image = tree.nodes.new(type='ShaderNodeTexImage')
+		node_image.image = sub.b_shade_texture
+		node_image.label = sub.map['ShadeTex']
+
+		x = b_mat_wrap.base_color_texture.node_image.location.x
+		y = b_mat_wrap.node_principled_bsdf.location.y
+		node_image.location = (x, y)
 
 	def create_armature_modifier(b_mesh_object, b_armature_object):
 		if b_armature_object is None:

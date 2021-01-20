@@ -71,25 +71,27 @@ def export_tso(tso, sample, dirname):
 		b_armature = b_armature_object.data
 		export_armature(b_armature, b_armature_object)
 
-	def add_texture(tex):
-		print("  tex name:{}".format(tex.name))
-		name = tex.name
+	def add_texture(name, image):
+		print("  tex name:{}".format(name))
 
 		for t_tex in tso.textures:
 			if t_tex.name == name:
 				return {'EXISTS'}
 
-		if tex.type != 'IMAGE':
-			return {'FAILED'}
-
 		t_tex = TSOTexture()
-		t_tex.name = tex.name
-		t_tex.path = '"' + tex.image.name + '"'
-		t_tex.width, t_tex.height = tex.image.size
-		t_tex.depth = tex.image.channels
-		t_tex.pixels_data(tex.image.pixels)
+		t_tex.name = name
+		t_tex.path = '"' + image.name + '"'
+		t_tex.width, t_tex.height = image.size
+		t_tex.depth = image.channels
+		t_tex.pixels_data(image.pixels)
 
 		tso.textures.append(t_tex)
+
+	def find_node_image(tree, label):
+		for node in tree.nodes:
+			if node.bl_idname == 'ShaderNodeTexImage' and node.label == label:
+				return node
+		return None
 
 	def add_material(mat):
 		print("  mat name:{}".format(mat.name))
@@ -117,16 +119,15 @@ def export_tso(tso, sample, dirname):
 		tso.sub_scripts.append(t_sub)
 
 		name = t_sub.map['ColorTex']
-		i = bpy.data.textures.find(name)
-		if i != -1:
-			tex = bpy.data.textures[i]
-			add_texture(tex)
+		tree = mat.node_tree
+		node_image = find_node_image(tree, name)
+		if node_image and node_image.image:
+			add_texture(name, node_image.image)
 
 		name = t_sub.map['ShadeTex']
-		i = bpy.data.textures.find(name)
-		if i != -1:
-			tex = bpy.data.textures[i]
-			add_texture(tex)
+		node_image = find_node_image(tree, name)
+		if node_image and node_image.image:
+			add_texture(name, node_image.image)
 
 		return spec
 
