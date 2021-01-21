@@ -322,8 +322,8 @@ def import_tso(tso, dirname):
 		### b_texslot.use_map_alpha = True
 
 		b_mat_wrap.base_color_texture.image = sub.b_color_texture
-		b_mat_wrap.base_color_texture.texcoords = 'UV'
 		b_mat_wrap.base_color_texture.node_image.label = sub.map['ColorTex']
+		b_mat_wrap.base_color_texture.texcoords = 'UV'
 
 		tree = b_mat.node_tree
 		node_image = tree.nodes.new(type='ShaderNodeTexImage')
